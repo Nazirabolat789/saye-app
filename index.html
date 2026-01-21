@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAYE - Life Balance Tracker v2.1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0FA8B2;
+            --primary-dark: #0D8A93;
+            --primary-light: #1E9F9F;
+            --accent: #F97316;
+            --success: #10B981;
+            --bg: #F0FDFA;
+            --bg-light: #E0F7F8;
+            --card: #FFFFFF;
+            --text: #0A5F66;
+            --text-light: #0C7C86;
+            --border: #B8E5E8;
+            --shadow: rgba(15, 168, 178, 0.1);
+        }
+
+        body.dark-mode {
+            --primary: #1FBFC9;
+            --primary-dark: #0FA8B2;
+            --primary-light: #2DD4DE;
+            --accent: #FB923C;
+            --success: #34D399;
+            --bg: #0A2429;
+            --bg-light: #0F3238;
+            --card: #153B42;
+            --text: #E0F7F8;
+            --text-light: #B8E5E8;
+            --border: #1E5A64;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, var(--bg-light) 100%);
+            color: var(--text);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: var(--card);
+            padding: 24px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .wave-logo {
+            font-size: 40px;
+            animation: wave 2s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        .brand h1 {
+            font-size: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .brand p {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .controls {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .date-display {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            padding: 10px 20px;
+            background: var(--bg-light);
+            border-radius: 12px;
+            border: 2px solid var(--border);
+        }
+
+        .dark-toggle {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .dark-toggle:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow);
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .nav-tab {
+            padding: 14px 28px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+            color: var(--text);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .nav-tab:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            padding: 28px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px var(--shadow);
+            border: 2px solid var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 3px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Calendar */
+        .calendar-container {
+            background: var(--card);
+            padding: 28px;
+            border-radius: 20px;
+            border: 2px solid var(--border);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .calendar-btn, .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .btn:hover, .calendar-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--accent);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .calendar-month {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 700;
+            padding: 12px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            border: 2px solid var(--border);
+            background: var(--bg-light);
+        }
+
+        .calendar-day:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .calendar-day.today {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .calendar-day.has-events::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+
+        /* Task List */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item {
+            padding: 20px;
+            background: var(--bg-light);
+            border-left: 4px solid var(--primary);
+            border-radius: 12px;
+            transition: all 0.3s;
+            border: 2px solid var(--border);
+        }
+
+        .task-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            border-left-color: var(--success);
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .checkbox {
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .task-emoji {
+            font-size: 24px;
+        }
+
+        .task-title {
+            font-weight: 600;
+            font-size: 18px;
+            flex: 1;
+            color: var(--text);
+        }
+
+        .task-time {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 600;
+            padding: 6px 12px;
+            background: var(--bg);
+            border-radius: 8px;
+        }
+
+        .task-details {
+            margin-left: 44px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Media Items */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .media-item {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .media-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow);
+            border-color: var(--primary);
+        }
+
+        .media-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .media-title {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text);
+            flex: 1;
+        }
+
+        .media-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-reading, .status-in-progress {
+            background: var(--primary);
+            color: white;
+        }
+
+        .status-to-read, .status-planned {
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .status-finished, .status-completed {
+            background: var(--success);
+            color: white;
+        }
+
+        .progress-bar-container {
+            margin: 12px 0;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--bg);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            transition: width 0.5s ease;
+        }
+
+        /* Life Balance */
+        .balance-wheel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .balance-sector {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .balance-sector:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px var(--shadow);
+        }
+
+        .balance-sector-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .balance-sector-name {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .balance-score {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .balance-progress {
+            width: 100%;
+            height: 12px;
+            background: var(--bg);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .balance-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            transition: width 0.5s ease;
+        }
+
+        /* Sector Accordion */
+        .sector-accordion {
+            margin-bottom: 16px;
+        }
+
+        .sector-header {
+            background: var(--primary);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .sector-header:hover {
+            background: var(--primary-dark);
+        }
+
+        .sector-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .sector-content.open {
+            max-height: 3000px;
+            padding: 20px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 0 0 12px 12px;
+            margin-top: -8px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            padding: 32px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--border);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 3px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .close-modal:hover {
+            color: var(--accent);
+        }
+
+        /* Input Fields */
+        .input-group {
+            margin: 16px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-light);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 16px;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Stats */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-light);
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid var(--border);
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+            header {
+                flex-direction: column;
+                gap: 16px;
+            }
+            .brand h1 {
+                font-size: 24px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 6px;
+        }
+
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 16px; }
+        .mb-2 { margin-bottom: 16px; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="wave-logo">🌊</div>
+                <div class="brand">
+                    <h1>SAYE</h1>
+                    <p>Saye yes to balanced life</p>
+                </div>
+            </div>
+            <div class="controls">
+                <div class="date-display" id="dateDisplay"></div>
+                <button class="dark-toggle" onclick="toggleDarkMode()" id="darkToggle">🌙</button>
+            </div>
+        </header>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="switchTab('calendar')">📅 Calendar</div>
+            <div class="nav-tab" onclick="switchTab('today')">✅ Today</div>
+            <div class="nav-tab" onclick="switchTab('media')">📚 Media</div>
+            <div class="nav-tab" onclick="switchTab('statistics')">📊 Statistics</div>
+            <div class="nav-tab" onclick="switchTab('kids')">👶 Kids</div>
+            <div class="nav-tab" onclick="switchTab('settings')">⚙️ Settings</div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="content-section active" id="calendar">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-nav">
+                        <button class="calendar-btn" onclick="previousMonth()">◀ Prev</button>
+                        <button class="calendar-btn" onclick="nextMonth()">Next ▶</button>
+                    </div>
+                    <div class="calendar-month" id="calendarMonth"></div>
+                    <button class="calendar-btn" onclick="goToToday()">Today</button>
+                </div>
+                <div class="calendar-grid">
+                    <div class="calendar-day-header">Sun</div>
+                    <div class="calendar-day-header">Mon</div>
+                    <div class="calendar-day-header">Tue</div>
+                    <div class="calendar-day-header">Wed</div>
+                    <div class="calendar-day-header">Thu</div>
+                    <div class="calendar-day-header">Fri</div>
+                    <div class="calendar-day-header">Sat</div>
+                    <div id="calendarDays"></div>
+                </div>
+            </div>
+
+            <div class="card mt-2">
+                <div class="card-header">
+                    <h2 class="card-title">📅 Selected Date Tasks</h2>
+                    <button class="btn" onclick="openAddEventModal()">+ Add Event</button>
+                </div>
+                <div id="selectedDateTasks">
+                    <p class="text-center" style="padding: 40px; color: var(--text-light);">
+                        Click a date on the calendar to view tasks
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today Section -->
+        <div class="content-section" id="today">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🎡 Life Balance Overview</h2>
+                </div>
+                <div class="balance-wheel" id="balanceWheel"></div>
+            </div>
+            <div id="todaySectors"></div>
+        </div>
+
+        <!-- Media Section -->
+        <div class="content-section" id="media">
+            <div class="stats-summary">
+                <div class="stat-card">
+                    <div class="stat-value" id="booksCount">0</div>
+                    <div class="stat-label">📖 Books Read</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="coursesCount">0</div>
+                    <div class="stat-label">📚 Courses Done</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="podcastsCount">0</div>
+                    <div class="stat-label">🎧 Podcasts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="moviesCount">0</div>
+                    <div class="stat-label">🎬 Movies</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📖 Books Tracker</h2>
+                    <button class="btn" onclick="openAddBookModal()">+ Add Book</button>
+                </div>
+                <h3 style="color: var(--primary); margin: 20px 0 12px 0;">Currently Reading</h3>
+                <div class="media-grid" id="booksReading"></div>
+                <h3 style="color: var(--text-light); margin: 20px 0 12px 0;">To Read</h3>
+                <div class="media-grid" id="booksToRead"></div>
+                <h3 style="color: var(--success); margin: 20px 0 12px 0;">Finished</h3>
+                <div class="media-grid" id="booksFinished"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📚 Courses Tracker</h2>
+                    <button class="btn" onclick="openAddCourseModal()">+ Add Course</button>
+                </div>
+                <h3 style="color: var(--primary); margin: 20px 0 12px 0;">In Progress</h3>
+                <div class="media-grid" id="coursesInProgress"></div>
+                <h3 style="color: var(--text-light); margin: 20px 0 12px 0;">Planned</h3>
+                <div class="media-grid" id="coursesPlanned"></div>
+                <h3 style="color: var(--success); margin: 20px 0 12px 0;">Completed</h3>
+                <div class="media-grid" id="coursesCompleted"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🎧 Podcasts</h2>
+                    <button class="btn" onclick="openAddPodcastModal()">+ Add Podcast</button>
+                </div>
+                <div class="media-grid" id="podcastsList"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🎬 Movies & Shows</h2>
+                    <button class="btn" onclick="openAddMovieModal()">+ Add Movie/Show</button>
+                </div>
+                <div class="media-grid" id="moviesList"></div>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="content-section" id="statistics">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📊 Life Balance Statistics</h2>
+                </div>
+                <div class="balance-wheel" id="statsBalanceWheel"></div>
+            </div>
+        </div>
+
+        <!-- Kids Section -->
+        <div class="content-section" id="kids">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">👶 Kids Manager</h2>
+                </div>
+                <div id="kidsList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="content-section" id="settings">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">💾 Export & Backup</h2>
+                </div>
+                <p style="margin-bottom: 16px;">Save your data regularly!</p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button class="btn" onclick="exportData()">📥 Export Data</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📤 Import Data</button>
+                    <button class="btn btn-success" onclick="clearAllData()">🗑️ Clear Data</button>
+                </div>
+                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">ℹ️ About SAYE v2.1</h2>
+                </div>
+                <p><strong>SAYE - Life Balance Tracker v2.1</strong></p>
+                <p style="margin-top: 12px;">Complete life management with 8 balance sectors, weekly routines, media tracking, and statistics.</p>
+                <p style="margin-top: 12px;"><strong>Sea Whisper Teal Theme (#0FA8B2)</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="addEventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Event</h3>
+                <button class="close-modal" onclick="closeModal('addEventModal')">×</button>
+            </div>
+            <div class="input-group">
+                <label>Event Title</label>
+                <input type="text" id="eventTitle" placeholder="Enter event title">
+            </div>
+            <div class="input-group">
+                <label>Sector</label>
+                <select id="eventSector">
+                    <option value="career">🎯 Career</option>
+                    <option value="health">💪 Health</option>
+                    <option value="mental">🧠 Mental</option>
+                    <option value="family">👨‍👩‍👧‍👦 Family</option>
+                    <option value="financial">💰 Financial</option>
+                    <option value="creativity">🎨 Creativity</option>
+                    <option value="learning">🌱 Learning</option>
+                    <option value="fun">🎉 Fun</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Time</label>
+                <input type="time" id="eventTime">
+            </div>
+            <div class="input-group">
+                <label>Notes</label>
+                <textarea id="eventNotes" rows="3"></textarea>
+            </div>
+            <button class="btn" onclick="saveEvent()" style="width: 100%; margin-top: 16px;">Save Event</button>
+        </div>
+    </div>
+
+    <div class="modal" id="addBookModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Book</h3>
+                <button class="close-modal" onclick="closeModal('addBookModal')">×</button>
+            </div>
+            <div class="input-group">
+                <label>Book Title</label>
+                <input type="text" id="bookTitle">
+            </div>
+            <div class="input-group">
+                <label>Author</label>
+                <input type="text" id="bookAuthor">
+            </div>
+            <div class="input-group">
+                <label>Category</label>
+                <select id="bookCategory">
+                    <option value="career">Career</option>
+                    <option value="pleasure">Pleasure</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Total Pages</label>
+                <input type="number" id="bookPages">
+            </div>
+            <div class="input-group">
+                <label>Status</label>
+                <select id="bookStatus">
+                    <option value="to-read">To Read</option>
+                    <option value="reading">Reading</option>
+                    <option value="finished">Finished</option>
+                </select>
+            </div>
+            <button class="btn" onclick="saveBook()" style="width: 100%; margin-top: 16px;">Add Book</button>
+        </div>
+    </div>
+
+    <div class="modal" id="updateBookModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Update Book Progress</h3>
+                <button class="close-modal" onclick="closeModal('updateBookModal')">×</button>
+            </div>
+            <div class="input-group">
+                <label>Current Page</label>
+                <input type="number" id="updateBookPage">
+            </div>
+            <div class="input-group">
+                <label>Status</label>
+                <select id="updateBookStatus">
+                    <option value="to-read">To Read</option>
+                    <option value="reading">Reading</option>
+                    <option value="finished">Finished</option>
+                </select>
+            </div>
+            <button class="btn" onclick="saveBookUpdate()" style="width: 100%; margin-top: 16px;">Update</button>
+        </div>
+    </div>
+
+    <div class="modal" id="addCourseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Course</h3>
+                <button class="close-modal" onclick="closeModal('addCourseModal')">×</button>
+            </div>
+            <div class="input-group">
+                <label>Course Name</label>
+                <input type="text" id="courseName">
+            </div>
+            <div class="input-group">
+                <label>Platform</label>
+                <input type="text" id="coursePlatform">
+            </div>
+            <div class="input-group">
+                <label>Status</label>
+                <select id="courseStatus">
+                    <option value="planned">Planned</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Progress %</label>
+                <input type="number" id="courseProgress" min="0" max="100">
+            </div>
+            <button class="btn" onclick="saveCourse()" style="width: 100%; margin-top: 16px;">Add Course</button>
+        </div>
+    </div>
+
+    <div class="modal" id="updateCourseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Update Course Progress</h3>
+                <button class="close-modal" onclick="closeModal('updateCourseModal')">×</button>
+            </div>
+            <div class="input-group">
+                <label>Progress %</label>
+                <input type="number" id="updateCourseProgress" min="0" max="100">
+            </div>
+            <div class="input-group">
+                <label>Status</label>
+                <select id="updateCourseStatus">
+                    <option value="planned">Planned</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+            <button class="btn" onclick="saveCourseUpdate()" style="width: 100%; margin-top: 16px;">Update</button>
+        </div>
+    </div>
+
+    <div class="modal" id="addPodcastModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Podcast</h3>
+                <button class="close-modal" onclick="closeModal('addPodcastModal')">×</button>
+            </div>
+            <div class="input-group">
+                <label>Podcast Name</label>
+                <input type="text" id="podcastName">
+            </div>
+            <div class="input-group">
+                <label>Host</label>
+                <input type="text" id="podcastHost">
+            </div>
+            <div class="input-group">
+                <label>Status</label>
+                <select id="podcastStatus">
+                    <option value="queue">Queue</option>
+                    <option value="listening">Listening</option>
+                    <option value="finished">Finished</option>
+                </select>
+            </div>
+            <button class="btn" onclick="savePodcast()" style="width: 100%; margin-top: 16px;">Add Podcast</button>
+        </div>
+    </div>
+
+    <div class="modal" id="addMovieModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Movie/Show</h3>
+                <button class="close-modal" onclick="closeModal('addMovieModal')">×</button>
+            </div>
+            <div class="input-group">
+                <label>Title</label>
+                <input type="text" id="movieTitle">
+            </div>
+            <div class="input-group">
+                <label>Type</label>
+                <select id="movieType">
+                    <option value="movie">Movie</option>
+                    <option value="tvshow">TV Show</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Status</label>
+                <select id="movieStatus">
+                    <option value="watchlist">Watchlist</option>
+                    <option value="watching">Watching</option>
+                    <option value="watched">Watched</option>
+                </select>
+            </div>
+            <button class="btn" onclick="saveMovie()" style="width: 100%; margin-top: 16px;">Add</button>
+        </div>
+    </div>
+
+    <script>
+        // App State with Pre-loaded Data
+        let appData = {
+            events: {},
+            books: [
+                {id: 1, title: "Leading Change", author: "John Kotter", category: "career", totalPages: 208, currentPage: 0, status: "reading", startDate: "Jan 6, 2025"},
+                {id: 2, title: "The Fifth Discipline", author: "Peter Senge", category: "career", totalPages: 424, currentPage: 0, status: "to-read"},
+                {id: 3, title: "The Innovative University", author: "Clayton Christensen", category: "career", totalPages: 512, currentPage: 0, status: "to-read"},
+                {id: 4, title: "Good to Great", author: "Jim Collins", category: "career", totalPages: 300, currentPage: 0, status: "to-read"},
+                {id: 5, title: "Competing in the Age of AI", author: "Marco Iansiti", category: "career", totalPages: 288, currentPage: 0, status: "to-read"},
+                {id: 6, title: "Research Management", author: "TBD", category: "career", totalPages: 350, currentPage: 0, status: "to-read"},
+                {id: 7, title: "Digital Transformation", author: "TBD", category: "career", totalPages: 300, currentPage: 0, status: "to-read"},
+                {id: 8, title: "The Lean Startup", author: "Eric Ries", category: "career", totalPages: 336, currentPage: 0, status: "to-read"},
+                {id: 9, title: "Crucial Conversations", author: "Kerry Patterson", category: "career", totalPages: 288, currentPage: 0, status: "to-read"},
+                {id: 10, title: "The Advantage", author: "Patrick Lencioni", category: "career", totalPages: 240, currentPage: 0, status: "to-read"},
+                {id: 11, title: "How to Be an Inclusive Leader", author: "Jennifer Brown", category: "career", totalPages: 256, currentPage: 0, status: "to-read"},
+                {id: 12, title: "Range", author: "David Epstein", category: "career", totalPages: 352, currentPage: 0, status: "to-read"},
+                {id: 13, title: "The Hobbit", author: "J.R.R. Tolkien", category: "pleasure", totalPages: 300, currentPage: 75, status: "reading"},
+                {id: 14, title: "Pleasure Book 2", author: "Your Choice", category: "pleasure", totalPages: 300, currentPage: 0, status: "to-read"},
+                {id: 15, title: "Pleasure Book 3", author: "Your Choice", category: "pleasure", totalPages: 300, currentPage: 0, status: "to-read"}
+            ],
+            courses: [
+                {id: 1, name: "Elements of AI", platform: "University of Helsinki", status: "in-progress", progress: 20, targetDate: "Jan 31"},
+                {id: 2, name: "MIT System Dynamics", platform: "MIT OCW", status: "planned", progress: 0, targetDate: "Feb 2025"},
+                {id: 3, name: "FOSTER Open Science", platform: "FOSTER", status: "planned", progress: 0, targetDate: "Mar 2025"},
+                {id: 4, name: "Strategic Leadership", platform: "Coursera", status: "planned", progress: 0, targetDate: "Apr 2025"},
+                {id: 5, name: "AI For Everyone", platform: "Coursera", status: "planned", progress: 0, targetDate: "May 2025"},
+                {id: 6, name: "NIH Grant Writing", platform: "NIH", status: "planned", progress: 0, targetDate: "Jun 2025"},
+                {id: 7, name: "Digital Transformation", platform: "edX", status: "planned", progress: 0, targetDate: "Jul 2025"},
+                {id: 8, name: "Y Combinator Startup School", platform: "Y Combinator", status: "planned", progress: 0, targetDate: "Aug 2025"},
+                {id: 9, name: "DEI in Higher Education", platform: "Online", status: "planned", progress: 0, targetDate: "Nov 2025"}
+            ],
+            podcasts: [],
+            movies: [],
+            kids: [
+                {id: 'dimash', name: 'Dimash', emoji: '👦'},
+                {id: 'darmen', name: 'Darmen', emoji: '👶'}
+            ],
+            balanceScores: {
+                career: 8, health: 7, mental: 9, family: 8,
+                financial: 6, creativity: 7, learning: 9, fun: 7
+            }
+        };
+
+        let currentDate = new Date();
+        let selectedDate = new Date();
+        let currentBookId = null;
+        let currentCourseId = null;
+
+        const sectors = {
+            career: {name: 'Career', emoji: '🎯'},
+            health: {name: 'Health', emoji: '💪'},
+            mental: {name: 'Mental', emoji: '🧠'},
+            family: {name: 'Family', emoji: '👨‍👩‍👧‍👦'},
+            financial: {name: 'Financial', emoji: '💰'},
+            creativity: {name: 'Creativity', emoji: '🎨'},
+            learning: {name: 'Learning', emoji: '🌱'},
+            fun: {name: 'Fun', emoji: '🎉'}
+        };
+
+        // Weekly Template
+        const weeklyTemplate = {
+            1: [ // Monday
+                {title: "Morning Routine", sector: "mental", time: "05:30", notes: "Meditation • Palming • Vitamins", completed: false},
+                {title: "Yoga", sector: "health", time: "08:30", notes: "1 hour", completed: false},
+                {title: "Course Learning", sector: "learning", time: "10:00", notes: "Elements of AI", completed: false},
+                {title: "Palming Break", sector: "health", time: "11:00", notes: "5 min", completed: false},
+                {title: "Darmen Speech Therapy", sector: "family", time: "11:40", notes: "Pickup", completed: false},
+                {title: "Drawing", sector: "creativity", time: "12:00", notes: "30 min", completed: false},
+                {title: "Lunch + Expenses", sector: "financial", time: "12:30", notes: "Log in notebook", completed: false},
+                {title: "Reading - Leading Change", sector: "learning", time: "13:05", notes: "2 hours", completed: false},
+                {title: "Kids Pickup", sector: "family", time: "15:20", notes: "Both kids", completed: false},
+                {title: "Reading (During TKD)", sector: "fun", time: "17:00", notes: "1 hour", completed: false},
+                {title: "Family Dinner", sector: "family", time: "18:30", notes: "SACRED TIME", completed: false},
+                {title: "Reading with Kids", sector: "family", time: "19:30", notes: "Stories", completed: false},
+                {title: "Piano", sector: "creativity", time: "20:30", notes: "30 min", completed: false},
+                {title: "Gratitude Journal", sector: "mental", time: "21:15", notes: "3 things", completed: false},
+                {title: "Bedtime", sector: "health", time: "21:30", notes: "Sleep", completed: false}
+            ],
+            2: [ // Tuesday
+                {title: "Morning Routine", sector: "mental", time: "05:30", notes: "Meditation • Palming", completed: false},
+                {title: "Gym", sector: "health", time: "08:30", notes: "1 hour", completed: false},
+                {title: "Course Learning", sector: "learning", time: "10:00", notes: "1 hour", completed: false},
+                {title: "Software Practice", sector: "learning", time: "11:05", notes: "55 min", completed: false},
+                {title: "Darmen Speech Therapy", sector: "family", time: "12:40", notes: "Pickup", completed: false},
+                {title: "Lunch + Expenses", sector: "financial", time: "13:00", notes: "Track", completed: false},
+                {title: "Reading", sector: "learning", time: "13:35", notes: "1.5 hours", completed: false},
+                {title: "Kids Pickup", sector: "family", time: "15:15", notes: "Both", completed: false},
+                {title: "Reading (During TKD)", sector: "fun", time: "16:00", notes: "1 hour", completed: false},
+                {title: "Family Dinner", sector: "family", time: "18:30", notes: "Together", completed: false},
+                {title: "Reading with Kids", sector: "family", time: "19:30", notes: "Stories", completed: false},
+                {title: "Piano", sector: "creativity", time: "20:00", notes: "1 hour", completed: false},
+                {title: "Bedtime", sector: "health", time: "21:30", notes: "Sleep", completed: false}
+            ],
+            3: [ // Wednesday
+                {title: "Morning Routine", sector: "mental", time: "05:30", notes: "Meditation", completed: false},
+                {title: "Campus - Learning Block 1", sector: "career", time: "09:30", notes: "1.5 hours", completed: false},
+                {title: "Writing/Deliverables", sector: "career", time: "11:05", notes: "1.5 hours", completed: false},
+                {title: "Lunch Break", sector: "health", time: "12:30", notes: "Walk, rest", completed: false},
+                {title: "Campus - Learning Block 2", sector: "learning", time: "13:35", notes: "1.5 hours", completed: false},
+                {title: "Reading Block", sector: "learning", time: "15:05", notes: "1.5 hours", completed: false},
+                {title: "Admin/Emails", sector: "career", time: "16:30", notes: "30 min", completed: false},
+                {title: "Pickup Dimash from TKD", sector: "family", time: "18:00", notes: "Drive home", completed: false},
+                {title: "Family Dinner", sector: "family", time: "18:45", notes: "Later dinner", completed: false},
+                {title: "Reading with Kids", sector: "family", time: "19:30", notes: "Stories", completed: false},
+                {title: "Piano or Rest", sector: "creativity", time: "20:30", notes: "Flexible", completed: false},
+                {title: "Bedtime", sector: "health", time: "21:30", notes: "Sleep", completed: false}
+            ],
+            4: [ // Thursday
+                {title: "Morning Routine", sector: "mental", time: "05:30", notes: "Meditation", completed: false},
+                {title: "Gym", sector: "health", time: "08:30", notes: "1 hour", completed: false},
+                {title: "Course Learning", sector: "learning", time: "10:00", notes: "1 hour", completed: false},
+                {title: "Darmen Speech Therapy", sector: "family", time: "11:40", notes: "Pickup", completed: false},
+                {title: "Trader Joe's", sector: "financial", time: "12:00", notes: "Weekly grocery", completed: false},
+                {title: "Lunch", sector: "health", time: "13:00", notes: "Eat", completed: false},
+                {title: "Reading", sector: "learning", time: "13:35", notes: "1.5 hours", completed: false},
+                {title: "Kids Pickup", sector: "family", time: "15:15", notes: "Both", completed: false},
+                {title: "Reading (During TKD)", sector: "fun", time: "17:00", notes: "1 hour", completed: false},
+                {title: "Family Dinner", sector: "family", time: "18:30", notes: "Together", completed: false},
+                {title: "Reading with Kids", sector: "family", time: "19:30", notes: "Stories", completed: false},
+                {title: "Piano", sector: "creativity", time: "20:30", notes: "1 hour", completed: false},
+                {title: "Bedtime", sector: "health", time: "21:30", notes: "Sleep", completed: false}
+            ],
+            5: [ // Friday
+                {title: "Morning Routine", sector: "mental", time: "05:30", notes: "Meditation", completed: false},
+                {title: "Yoga", sector: "health", time: "09:00", notes: "30 min", completed: false},
+                {title: "Course Learning", sector: "learning", time: "10:00", notes: "1.5 hours", completed: false},
+                {title: "Drawing", sector: "creativity", time: "11:35", notes: "1 hour", completed: false},
+                {title: "Lunch + Expenses", sector: "financial", time: "12:30", notes: "Track", completed: false},
+                {title: "Reading", sector: "learning", time: "13:05", notes: "2 hours", completed: false},
+                {title: "Kids Pickup", sector: "family", time: "15:15", notes: "Both", completed: false},
+                {title: "Reading (During TKD)", sector: "fun", time: "16:00", notes: "1 hour", completed: false},
+                {title: "Family Movie Night", sector: "fun", time: "18:30", notes: "Fun Friday!", completed: false},
+                {title: "Reading with Kids", sector: "family", time: "19:30", notes: "Stories", completed: false},
+                {title: "Personal Time", sector: "fun", time: "20:30", notes: "Piano/relax", completed: false},
+                {title: "Bedtime", sector: "health", time: "22:00", notes: "Friday late", completed: false}
+            ],
+            6: [ // Saturday
+                {title: "Sleep In", sector: "health", time: "08:00", notes: "Rest", completed: false},
+                {title: "POOL SESSION", sector: "fun", time: "09:30", notes: "YOUR JOY RITUAL!", completed: false},
+                {title: "Deep Dive Learning", sector: "learning", time: "14:00", notes: "1 hour", completed: false},
+                {title: "Family Activity", sector: "family", time: "15:00", notes: "2 hours", completed: false},
+                {title: "Family Dinner", sector: "family", time: "18:00", notes: "Together", completed: false},
+                {title: "Family Movie Night", sector: "fun", time: "19:00", notes: "Fun", completed: false},
+                {title: "Bedtime", sector: "health", time: "22:00", notes: "Sleep", completed: false}
+            ],
+            0: [ // Sunday
+                {title: "Sleep In", sector: "health", time: "08:00", notes: "Rest", completed: false},
+                {title: "Family Morning", sector: "family", time: "10:00", notes: "Church/activity", completed: false},
+                {title: "Family Time", sector: "family", time: "13:00", notes: "Together", completed: false},
+                {title: "WEEKLY REVIEW", sector: "career", time: "20:00", notes: "Plan next week", completed: false},
+                {title: "Early Bedtime", sector: "health", time: "21:30", notes: "Monday 5:30", completed: false}
+            ]
+        };
+
+        function init() {
+            loadData();
+            generateWeeklySchedule();
+            updateDateDisplay();
+            renderCalendar();
+            renderBalanceWheel();
+            renderTodaySectors();
+            renderMedia();
+            renderKids();
+            autoCheckDarkMode();
+            selectDate(new Date());
+        }
+
+        function generateWeeklySchedule() {
+            const today = new Date();
+            for (let i = 0; i < 14; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() + i);
+                const dateKey = formatDateKey(date);
+                const dayNum = date.getDay();
+                if (!appData.events[dateKey] && weeklyTemplate[dayNum]) {
+                    appData.events[dateKey] = JSON.parse(JSON.stringify(weeklyTemplate[dayNum]));
+                }
+            }
+            saveData();
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('sayeData');
+            if (saved) {
+                const loaded = JSON.parse(saved);
+                appData = {...appData, ...loaded};
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('sayeData', JSON.stringify(appData));
+        }
+
+        function updateDateDisplay() {
+            const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+            document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-US', options);
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            document.getElementById('calendarMonth').textContent = 
+                currentDate.toLocaleDateString('en-US', {month: 'long', year: 'numeric'});
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+            let html = '';
+            for (let i = firstDay - 1; i >= 0; i--) {
+                html += `<div class="calendar-day other-month">${daysInPrevMonth - i}</div>`;
+            }
+
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dateKey = formatDateKey(date);
+                const isToday = date.toDateString() === today.toDateString();
+                const hasEvents = appData.events[dateKey] && appData.events[dateKey].length > 0;
+                html += `<div class="calendar-day ${isToday ? 'today' : ''} ${hasEvents ? 'has-events' : ''}" 
+                         onclick="selectDate(new Date(${year}, ${month}, ${day}))">${day}</div>`;
+            }
+
+            const totalCells = firstDay + daysInMonth;
+            const remainingCells = 42 - totalCells;
+            for (let i = 1; i <= remainingCells; i++) {
+                html += `<div class="calendar-day other-month">${i}</div>`;
+            }
+
+            document.getElementById('calendarDays').innerHTML = html;
+        }
+
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            selectedDate = new Date();
+            renderCalendar();
+            selectDate(selectedDate);
+        }
+
+        function selectDate(date) {
+            selectedDate = date;
+            const dateKey = formatDateKey(date);
+            const events = appData.events[dateKey] || [];
+            
+            const dateStr = date.toLocaleDateString('en-US', {weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'});
+            let html = `<h3 style="color: var(--primary); margin-bottom: 16px;">${dateStr}</h3>`;
+            
+            if (events.length === 0) {
+                html += `<p class="text-center" style="padding: 20px; color: var(--text-light);">No events for this date.</p>`;
+            } else {
+                html += '<div class="task-list">';
+                events.forEach((event, index) => {
+                    html += `
+                        <div class="task-item ${event.completed ? 'completed' : ''}">
+                            <div class="task-header">
+                                <input type="checkbox" class="checkbox" ${event.completed ? 'checked' : ''} 
+                                       onchange="toggleEventComplete('${dateKey}', ${index})">
+                                <span class="task-emoji">${sectors[event.sector].emoji}</span>
+                                <span class="task-title">${event.title}</span>
+                                ${event.time ? `<span class="task-time">${event.time}</span>` : ''}
+                            </div>
+                            ${event.notes ? `<div class="task-details">${event.notes}</div>` : ''}
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+            
+            document.getElementById('selectedDateTasks').innerHTML = html;
+        }
+
+        function formatDateKey(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        function toggleEventComplete(dateKey, index) {
+            if (!appData.events[dateKey]) return;
+            appData.events[dateKey][index].completed = !appData.events[dateKey][index].completed;
+            saveData();
+            selectDate(selectedDate);
+            renderTodaySectors();
+        }
+
+        function renderBalanceWheel() {
+            const html = Object.keys(sectors).map(key => {
+                const sector = sectors[key];
+                const score = appData.balanceScores[key] || 0;
+                return `
+                    <div class="balance-sector">
+                        <div class="balance-sector-header">
+                            <span class="balance-sector-name">${sector.emoji} ${sector.name}</span>
+                            <span class="balance-score">${score}/10</span>
+                        </div>
+                        <div class="balance-progress">
+                            <div class="balance-progress-bar" style="width: ${score * 10}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('balanceWheel').innerHTML = html;
+            document.getElementById('statsBalanceWheel').innerHTML = html;
+        }
+
+        function renderTodaySectors() {
+            const today = formatDateKey(new Date());
+            const todayEvents = appData.events[today] || [];
+            
+            let html = '';
+            Object.keys(sectors).forEach(key => {
+                const sector = sectors[key];
+                const sectorEvents = todayEvents.filter(e => e.sector === key);
+                
+                if (sectorEvents.length > 0) {
+                    html += `
+                        <div class="sector-accordion">
+                            <div class="sector-header" onclick="toggleSector('${key}')">
+                                <span>${sector.emoji} ${sector.name.toUpperCase()}</span>
+                                <span>${sectorEvents.length} tasks</span>
+                            </div>
+                            <div class="sector-content" id="sector-${key}">
+                                <div class="task-list">
+                                    ${sectorEvents.map((event, index) => `
+                                        <div class="task-item ${event.completed ? 'completed' : ''}">
+                                            <div class="task-header">
+                                                <input type="checkbox" class="checkbox" ${event.completed ? 'checked' : ''} 
+                                                       onchange="toggleEventComplete('${today}', ${todayEvents.indexOf(event)})">
+                                                <span class="task-title">${event.title}</span>
+                                                ${event.time ? `<span class="task-time">${event.time}</span>` : ''}
+                                            </div>
+                                            ${event.notes ? `<div class="task-details">${event.notes}</div>` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (html === '') {
+                html = `<div class="card"><p class="text-center" style="padding: 40px; color: var(--text-light);">No tasks for today.</p></div>`;
+            }
+            
+            document.getElementById('todaySectors').innerHTML = html;
+        }
+
+        function toggleSector(key) {
+            const content = document.getElementById(`sector-${key}`);
+            content.classList.toggle('open');
+        }
+
+        function renderMedia() {
+            renderBooks();
+            renderCourses();
+            renderPodcasts();
+            renderMovies();
+            updateMediaStats();
+        }
+
+        function renderBooks() {
+            const reading = appData.books.filter(b => b.status === 'reading');
+            const toRead = appData.books.filter(b => b.status === 'to-read');
+            const finished = appData.books.filter(b => b.status === 'finished');
+
+            document.getElementById('booksReading').innerHTML = reading.length > 0 ? 
+                reading.map(book => createBookCard(book)).join('') :
+                '<p class="text-center" style="padding: 20px; color: var(--text-light);">No books currently reading</p>';
+
+            document.getElementById('booksToRead').innerHTML = toRead.length > 0 ?
+                toRead.map(book => createBookCard(book)).join('') :
+                '<p class="text-center" style="padding: 20px; color: var(--text-light);">No books in reading list</p>';
+
+            document.getElementById('booksFinished').innerHTML = finished.length > 0 ?
+                finished.map(book => createBookCard(book)).join('') :
+                '<p class="text-center" style="padding: 20px; color: var(--text-light);">No books finished yet</p>';
+        }
+
+        function createBookCard(book) {
+            const progress = book.currentPage && book.totalPages ? 
+                Math.round((book.currentPage / book.totalPages) * 100) : 0;
+            
+            return `
+                <div class="media-item" onclick="openUpdateBookModal(${book.id})">
+                    <div class="media-header">
+                        <div class="media-title">${book.title}</div>
+                        <span class="media-status status-${book.status}">${book.status.replace('-', ' ')}</span>
+                    </div>
+                    ${book.author ? `<p style="color: var(--text-light); font-size: 14px; margin-bottom: 8px;">by ${book.author}</p>` : ''}
+                    ${book.status === 'reading' ? `
+                        <div class="progress-bar-container">
+                            <div class="progress-label">
+                                <span>${progress}%</span>
+                                <span>${book.currentPage || 0} / ${book.totalPages}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    <p style="color: var(--text-light); font-size: 12px; margin-top: 8px;">Click to update progress</p>
+                </div>
+            `;
+        }
+
+        function renderCourses() {
+            const inProgress = appData.courses.filter(c => c.status === 'in-progress');
+            const planned = appData.courses.filter(c => c.status === 'planned');
+            const completed = appData.courses.filter(c => c.status === 'completed');
+
+            document.getElementById('coursesInProgress').innerHTML = inProgress.length > 0 ?
+                inProgress.map(course => createCourseCard(course)).join('') :
+                '<p class="text-center" style="padding: 20px; color: var(--text-light);">No courses in progress</p>';
+
+            document.getElementById('coursesPlanned').innerHTML = planned.length > 0 ?
+                planned.map(course => createCourseCard(course)).join('') :
+                '<p class="text-center" style="padding: 20px; color: var(--text-light);">No planned courses</p>';
+
+            document.getElementById('coursesCompleted').innerHTML = completed.length > 0 ?
+                completed.map(course => createCourseCard(course)).join('') :
+                '<p class="text-center" style="padding: 20px; color: var(--text-light);">No courses completed yet</p>';
+        }
+
+        function createCourseCard(course) {
+            return `
+                <div class="media-item" onclick="openUpdateCourseModal(${course.id})">
+                    <div class="media-header">
+                        <div class="media-title">${course.name}</div>
+                        <span class="media-status status-${course.status}">${course.status.replace('-', ' ')}</span>
+                    </div>
+                    ${course.platform ? `<p style="color: var(--text-light); font-size: 14px; margin-bottom: 8px;">${course.platform}</p>` : ''}
+                    ${course.status === 'in-progress' && course.progress ? `
+                        <div class="progress-bar-container">
+                            <div class="progress-label">
+                                <span>${course.progress}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${course.progress}%"></div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    <p style="color: var(--text-light); font-size: 12px; margin-top: 8px;">Click to update</p>
+                </div>
+            `;
+        }
+
+        function renderPodcasts() {
+            document.getElementById('podcastsList').innerHTML = appData.podcasts.length > 0 ?
+                appData.podcasts.map(p => `
+                    <div class="media-item">
+                        <div class="media-header">
+                            <div class="media-title">${p.name}</div>
+                            <span class="media-status status-${p.status}">${p.status}</span>
+                        </div>
+                        ${p.host ? `<p style="color: var(--text-light);">${p.host}</p>` : ''}
+                    </div>
+                `).join('') :
+                '<p class="text-center" style="padding: 20px; color: var(--text-light);">No podcasts yet</p>';
+        }
+
+        function renderMovies() {
+            document.getElementById('moviesList').innerHTML = appData.movies.length > 0 ?
+                appData.movies.map(m => `
+                    <div class="media-item">
+                        <div class="media-header">
+                            <div class="media-title">${m.title}</div>
+                            <span class="media-status status-${m.status}">${m.status}</span>
+                        </div>
+                        <p style="color: var(--text-light);">${m.type === 'movie' ? '🎬 Movie' : '📺 TV Show'}</p>
+                    </div>
+                `).join('') :
+                '<p class="text-center" style="padding: 20px; color: var(--text-light);">No movies/shows yet</p>';
+        }
+
+        function updateMediaStats() {
+            document.getElementById('booksCount').textContent = appData.books.filter(b => b.status === 'finished').length;
+            document.getElementById('coursesCount').textContent = appData.courses.filter(c => c.status === 'completed').length;
+            document.getElementById('podcastsCount').textContent = appData.podcasts.filter(p => p.status === 'finished').length;
+            document.getElementById('moviesCount').textContent = appData.movies.filter(m => m.status === 'watched').length;
+        }
+
+        function renderKids() {
+            document.getElementById('kidsList').innerHTML = appData.kids.map(kid => `
+                <div style="background: var(--bg-light); padding: 24px; border-radius: 16px; border: 2px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span style="font-size: 20px; font-weight: 700; color: var(--primary);">${kid.name}</span>
+                        <span style="font-size: 32px;">${kid.emoji}</span>
+                    </div>
+                    <p style="color: var(--text-light); margin-top: 12px;">Track ${kid.name}'s daily routine and activities.</p>
+                </div>
+            `).join('');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function openAddEventModal() { openModal('addEventModal'); }
+        function openAddBookModal() { openModal('addBookModal'); }
+        function openAddCourseModal() { openModal('addCourseModal'); }
+        function openAddPodcastModal() { openModal('addPodcastModal'); }
+        function openAddMovieModal() { openModal('addMovieModal'); }
+
+        function openUpdateBookModal(bookId) {
+            currentBookId = bookId;
+            const book = appData.books.find(b => b.id === bookId);
+            document.getElementById('updateBookPage').value = book.currentPage || 0;
+            document.getElementById('updateBookStatus').value = book.status;
+            openModal('updateBookModal');
+        }
+
+        function openUpdateCourseModal(courseId) {
+            currentCourseId = courseId;
+            const course = appData.courses.find(c => c.id === courseId);
+            document.getElementById('updateCourseProgress').value = course.progress || 0;
+            document.getElementById('updateCourseStatus').value = course.status;
+            openModal('updateCourseModal');
+        }
+
+        function saveEvent() {
+            const title = document.getElementById('eventTitle').value;
+            const sector = document.getElementById('eventSector').value;
+            const time = document.getElementById('eventTime').value;
+            const notes = document.getElementById('eventNotes').value;
+
+            if (!title) { alert('Please enter a title'); return; }
+
+            const dateKey = formatDateKey(selectedDate);
+            if (!appData.events[dateKey]) appData.events[dateKey] = [];
+            appData.events[dateKey].push({title, sector, time, notes, completed: false});
+
+            saveData();
+            closeModal('addEventModal');
+            renderCalendar();
+            selectDate(selectedDate);
+            
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventTime').value = '';
+            document.getElementById('eventNotes').value = '';
+        }
+
+        function saveBook() {
+            const title = document.getElementById('bookTitle').value;
+            const author = document.getElementById('bookAuthor').value;
+            const category = document.getElementById('bookCategory').value;
+            const pages = document.getElementById('bookPages').value;
+            const status = document.getElementById('bookStatus').value;
+
+            if (!title) { alert('Please enter a title'); return; }
+
+            appData.books.push({
+                id: Date.now(),
+                title, author, category,
+                totalPages: parseInt(pages) || 0,
+                currentPage: 0,
+                status,
+                startDate: status === 'reading' ? new Date().toLocaleDateString() : null
+            });
+
+            saveData();
+            closeModal('addBookModal');
+            renderBooks();
+            updateMediaStats();
+            
+            document.getElementById('bookTitle').value = '';
+            document.getElementById('bookAuthor').value = '';
+            document.getElementById('bookPages').value = '';
+        }
+
+        function saveBookUpdate() {
+            const book = appData.books.find(b => b.id === currentBookId);
+            book.currentPage = parseInt(document.getElementById('updateBookPage').value) || 0;
+            book.status = document.getElementById('updateBookStatus').value;
+            
+            saveData();
+            closeModal('updateBookModal');
+            renderBooks();
+            updateMediaStats();
+        }
+
+        function saveCourse() {
+            const name = document.getElementById('courseName').value;
+            const platform = document.getElementById('coursePlatform').value;
+            const status = document.getElementById('courseStatus').value;
+            const progress = document.getElementById('courseProgress').value;
+
+            if (!name) { alert('Please enter a name'); return; }
+
+            appData.courses.push({
+                id: Date.now(),
+                name, platform, status,
+                progress: parseInt(progress) || 0
+            });
+
+            saveData();
+            closeModal('addCourseModal');
+            renderCourses();
+            updateMediaStats();
+            
+            document.getElementById('courseName').value = '';
+            document.getElementById('coursePlatform').value = '';
+            document.getElementById('courseProgress').value = '';
+        }
+
+        function saveCourseUpdate() {
+            const course = appData.courses.find(c => c.id === currentCourseId);
+            course.progress = parseInt(document.getElementById('updateCourseProgress').value) || 0;
+            course.status = document.getElementById('updateCourseStatus').value;
+            
+            saveData();
+            closeModal('updateCourseModal');
+            renderCourses();
+            updateMediaStats();
+        }
+
+        function savePodcast() {
+            const name = document.getElementById('podcastName').value;
+            const host = document.getElementById('podcastHost').value;
+            const status = document.getElementById('podcastStatus').value;
+
+            if (!name) { alert('Please enter a name'); return; }
+
+            appData.podcasts.push({id: Date.now(), name, host, status});
+            saveData();
+            closeModal('addPodcastModal');
+            renderPodcasts();
+            updateMediaStats();
+            
+            document.getElementById('podcastName').value = '';
+            document.getElementById('podcastHost').value = '';
+        }
+
+        function saveMovie() {
+            const title = document.getElementById('movieTitle').value;
+            const type = document.getElementById('movieType').value;
+            const status = document.getElementById('movieStatus').value;
+
+            if (!title) { alert('Please enter a title'); return; }
+
+            appData.movies.push({id: Date.now(), title, type, status});
+            saveData();
+            closeModal('addMovieModal');
+            renderMovies();
+            updateMediaStats();
+            
+            document.getElementById('movieTitle').value = '';
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            document.getElementById('darkToggle').textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('darkMode', isDark);
+        }
+
+        function autoCheckDarkMode() {
+            const hour = new Date().getHours();
+            if (hour >= 19 || hour < 7) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkToggle').textContent = '☀️';
+            }
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `saye-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            alert('Data exported successfully!');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        appData = JSON.parse(e.target.result);
+                        saveData();
+                        alert('Data imported! Refreshing...');
+                        location.reload();
+                    } catch (error) {
+                        alert('Error importing data.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Delete ALL data?')) {
+                if (confirm('Really sure?')) {
+                    localStorage.removeItem('sayeData');
+                    location.reload();
+                }
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
